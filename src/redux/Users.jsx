@@ -16,7 +16,9 @@ const Users = () => {
 
   const indexOfLastPost = currentPage * postsPerPge; // 10
   const indexOfFirstPost = indexOfLastPost - postsPerPge; // 10-10
-  const currentPosts = users && users.slice(indexOfFirstPost, indexOfLastPost); // 0-9 10 recors will display
+  const currentPosts =
+    reduxState.usersList &&
+    reduxState.usersList.slice(indexOfFirstPost, indexOfLastPost); // 0-9 10 recors will display
 
   const handlePagination = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -28,7 +30,7 @@ const Users = () => {
     const response = await axios.get(url);
     setUsers(response.data);
     setUsersCopy(response.data);
-    // dispatch(setUsersList(response.data));
+    dispatch(setUsersList(response.data));
     console.log(response.data);
   };
 
@@ -47,9 +49,9 @@ const Users = () => {
       data.title.toLowerCase().includes(searchedEle.toLowerCase())
     );
     if (searchedEle != "") {
-      setUsers(filteredData);
+      dispatch(setUsersList(filteredData));
     } else {
-      setUsers(usersCopy);
+      dispatch(setUsersList(usersCopy));
     }
     // console.log(filteredData);
   };
@@ -70,8 +72,8 @@ const Users = () => {
         </tr>
 
         {currentPosts &&
-          currentPosts.map((data) => (
-            <tr>
+          currentPosts.map((data, index) => (
+            <tr key={index}>
               <td>{data.id}</td>
               <td>{data.title}</td>
               {/* <td>{data.phone}</td> */}
@@ -79,7 +81,7 @@ const Users = () => {
           ))}
       </table>
       <Pagination
-        length={users && users.length}
+        length={reduxState.usersList && reduxState.usersList.length}
         postsPerPage={postsPerPge}
         handlePagination={handlePagination}
         currentPage={currentPage}
